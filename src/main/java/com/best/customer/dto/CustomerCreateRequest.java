@@ -1,4 +1,4 @@
-﻿package com.best.customer.dto;
+package com.best.customer.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
