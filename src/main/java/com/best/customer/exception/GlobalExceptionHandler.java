@@ -53,4 +53,20 @@ public class GlobalExceptionHandler {
                                 .status(HttpStatus.BAD_REQUEST)
                                 .body(response);
         }
+
+        @ExceptionHandler(CustomerNotFoundException.class)
+        public ResponseEntity<ApiErrorResponse> handleCustomerNotFound(
+                        CustomerNotFoundException ex,
+                        WebRequest request) {
+
+                ApiErrorResponse response = new ApiErrorResponse(
+                                HttpStatus.NOT_FOUND.value(),
+                                "CUSTOMER_NOT_FOUND",
+                                ex.getMessage(),
+                                request.getDescription(false).replace("uri=", ""));
+
+                return ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .body(response);
+        }
 }

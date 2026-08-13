@@ -20,6 +20,11 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
+    @GetMapping("/{id}")
+    public CustomerResponse getCustomer(@PathVariable Long id) {
+        return customerService.getCustomer(id);
+    }
+
     @PostMapping
     public ResponseEntity<CustomerResponse> createCustomer(
             @Valid @RequestBody CustomerCreateRequest request) {

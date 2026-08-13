@@ -10,6 +10,7 @@ import com.best.customer.dto.CustomerResponse;
 import com.best.customer.entity.Customer;
 import com.best.customer.entity.CustomerStatus;
 import com.best.customer.exception.CustomerEmailAlreadyExistsException;
+import com.best.customer.exception.CustomerNotFoundException;
 import com.best.customer.mapper.CustomerMapper;
 import com.best.customer.repository.CustomerRepository;
 
@@ -45,5 +46,13 @@ public class CustomerService {
         Customer savedCustomer = customerRepository.save(customer);
 
         return customerMapper.toResponse(savedCustomer);
+    }
+
+    public CustomerResponse getCustomer(Long id) {
+
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException(id));
+
+        return customerMapper.toResponse(customer);
     }
 }
