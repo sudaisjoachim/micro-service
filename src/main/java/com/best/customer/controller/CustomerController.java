@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.best.customer.dto.CustomerCreateRequest;
+import com.best.customer.dto.CustomerPatchRequest;
 import com.best.customer.dto.CustomerResponse;
 import com.best.customer.service.CustomerService;
 
@@ -20,11 +21,13 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
+    // Get a customer by ID
     @GetMapping("/{id}")
     public CustomerResponse getCustomer(@PathVariable Long id) {
         return customerService.getCustomer(id);
     }
 
+    // Create a new customer
     @PostMapping
     public ResponseEntity<CustomerResponse> createCustomer(
             @Valid @RequestBody CustomerCreateRequest request) {
@@ -34,5 +37,14 @@ public class CustomerController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
+    }
+
+    // Update a customer by ID
+    @PatchMapping("/{id}")
+    public CustomerResponse updateCustomer(
+            @PathVariable Long id,
+            @Valid @RequestBody CustomerPatchRequest request) {
+
+        return customerService.updateCustomer(id, request);
     }
 }
