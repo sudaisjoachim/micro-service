@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -28,6 +29,22 @@ public class GlobalExceptionHandler {
                 return ResponseEntity
                                 .status(HttpStatus.CONFLICT)
                                 .body(error);
+        }
+
+        @ExceptionHandler(CustomerNotFoundException.class)
+        public ResponseEntity<ApiErrorResponse> handleCustomerNotFound(
+                        CustomerNotFoundException ex,
+                        WebRequest request) {
+
+                ApiErrorResponse response = new ApiErrorResponse(
+                                HttpStatus.NOT_FOUND.value(),
+                                "CUSTOMER_NOT_FOUND",
+                                ex.getMessage(),
+                                request.getDescription(false).replace("uri=", ""));
+
+                return ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .body(response);
         }
 
         @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -54,19 +71,21 @@ public class GlobalExceptionHandler {
                                 .body(response);
         }
 
-        @ExceptionHandler(CustomerNotFoundException.class)
-        public ResponseEntity<ApiErrorResponse> handleCustomerNotFound(
-                        CustomerNotFoundException ex,
+        @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+        public ResponseEntity<ApiErrorResponse> handleOptimisticLocking(
+                        ObjectOptimisticLockingFailureException ex,
                         WebRequest request) {
 
                 ApiErrorResponse response = new ApiErrorResponse(
-                                HttpStatus.NOT_FOUND.value(),
-                                "CUSTOMER_NOT_FOUND",
-                                ex.getMessage(),
-                                request.getDescription(false).replace("uri=", ""));
+                                Instant.now(),
+                                HttpStatus.CONFLICT.value(),
+                                "OPTIMISTIC_LOCKING_CONFLICT",
+                                "The resource was modified by another request. Please refresh and try again.",
+                                request.getDescription(false).replace("uri=", ""),
+                                null);
 
                 return ResponseEntity
-                                .status(HttpStatus.NOT_FOUND)
+                                .status(HttpStatus.CONFLICT)
                                 .body(response);
         }
 }

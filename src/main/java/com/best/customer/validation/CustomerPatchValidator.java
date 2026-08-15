@@ -19,8 +19,7 @@ public class CustomerPatchValidator implements ConstraintValidator<ValidCustomer
         boolean valid = true;
 
         if (request.isPresent("firstName")) {
-            if (request.getFirstName() == null
-                    || request.getFirstName().isBlank()) {
+            if (request.getFirstName() == null || request.getFirstName().isBlank()) {
 
                 addError(context, "firstName", "must not be blank");
                 valid = false;
