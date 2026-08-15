@@ -2,7 +2,12 @@ package com.best.customer.entity;
 
 import java.time.Instant;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -16,6 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "customer", uniqueConstraints = {
         @UniqueConstraint(name = "uk_customer_email", columnNames = "email")
 })
@@ -35,8 +41,10 @@ public class Customer {
 
     @Enumerated(EnumType.STRING)
     private CustomerStatus status;
-
+    @CreatedDate
     private Instant createdAt;
+
+    @LastModifiedDate
     private Instant updatedAt;
     @Version
     private Long version;

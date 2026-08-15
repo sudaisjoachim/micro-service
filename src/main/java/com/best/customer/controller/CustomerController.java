@@ -1,5 +1,6 @@
 package com.best.customer.controller;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import com.best.customer.dto.CustomerCreateRequest;
 import com.best.customer.dto.CustomerPatchRequest;
 import com.best.customer.dto.CustomerResponse;
+import com.best.customer.dto.PageResponse;
 import com.best.customer.service.CustomerService;
 
 import jakarta.validation.Valid;
@@ -25,6 +27,12 @@ public class CustomerController {
     @GetMapping("/{id}")
     public CustomerResponse getCustomer(@PathVariable Long id) {
         return customerService.getCustomer(id);
+    }
+
+    // Get a paginated list of customers
+    @GetMapping
+    public PageResponse<CustomerResponse> getCustomers(Pageable pageable) {
+        return customerService.getCustomers(pageable);
     }
 
     // Create a new customer
@@ -46,5 +54,12 @@ public class CustomerController {
             @Valid @RequestBody CustomerPatchRequest request) {
 
         return customerService.updateCustomer(id, request);
+    }
+
+    // Delete a customer by ID
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCustomer(@PathVariable Long id) {
+        customerService.deleteCustomer(id);
     }
 }
