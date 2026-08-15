@@ -2,6 +2,7 @@ package com.best.customer.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.time.Instant;
 
@@ -186,6 +187,64 @@ class CustomerRepositoryTest {
                 999L);
 
         assertThat(exists).isTrue();
+    }
+
+    // Test to check if version is incremented when customer is updated
+    @Test
+    void shouldIncrementVersionWhenCustomerIsUpdated() {
+
+        Customer customer = new Customer();
+        customer.setFirstName("Version");
+        customer.setLastName("Test");
+        customer.setEmail("version-test@example.com");
+        customer.setPhone("09000000001");
+        customer.setStatus(CustomerStatus.ACTIVE);
+
+        Customer savedCustomer = customerRepository.saveAndFlush(customer);
+
+        assertThat(savedCustomer.getVersion()).isNotNull();
+
+        Long initialVersion = savedCustomer.getVersion();
+
+        savedCustomer.setPhone("09000000002");
+
+        Customer updatedCustomer = customerRepository.saveAndFlush(savedCustomer);
+
+        assertThat(updatedCustomer.getVersion()).isGreaterThan(initialVersion);
+    }
+
+    // Test to check if optimistic locking works
+    @Test
+    void shouldRejectUpdateWhenEntityVersionIsStale() {
+
+        Customer customer = new Customer();
+        customer.setFirstName("Lock");
+        customer.setLastName("Test");
+        customer.setEmail("optimistic-lock@example.com");
+        customer.setPhone("09000000001");
+        customer.setStatus(CustomerStatus.ACTIVE);
+
+        Customer savedCustomer = customerRepository.saveAndFlush(customer);
+
+        // Simulate another copy of the same database row
+        Customer staleCustomer = new Customer();
+        staleCustomer.setId(savedCustomer.getId());
+        staleCustomer.setFirstName(savedCustomer.getFirstName());
+        staleCustomer.setLastName(savedCustomer.getLastName());
+        staleCustomer.setEmail(savedCustomer.getEmail());
+        staleCustomer.setPhone(savedCustomer.getPhone());
+        staleCustomer.setStatus(savedCustomer.getStatus());
+        staleCustomer.setVersion(savedCustomer.getVersion());
+
+        // First update succeeds and increments the version
+        savedCustomer.setPhone("09000000002");
+        customerRepository.saveAndFlush(savedCustomer);
+
+        // Second update uses the old version
+        staleCustomer.setPhone("09000000003");
+
+        assertThatThrownBy(() -> customerRepository.saveAndFlush(staleCustomer))
+                .isInstanceOf(ObjectOptimisticLockingFailureException.class);
     }
 
 }
