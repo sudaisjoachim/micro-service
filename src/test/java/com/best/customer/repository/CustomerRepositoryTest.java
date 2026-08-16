@@ -86,9 +86,7 @@ class CustomerRepositoryTest {
     // Test finding a customer by email when the email does not exist
     @Test
     void shouldReturnEmptyWhenCustomerEmailDoesNotExist() {
-
         var customer = customerRepository.findByEmail("does-not-exist@example.com");
-
         assertThat(customer).isEmpty();
     }
 
