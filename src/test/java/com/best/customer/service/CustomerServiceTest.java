@@ -515,7 +515,6 @@ public class CustomerServiceTest {
         assertThat(result.size()).isEqualTo(10);
         assertThat(result.totalElements()).isEqualTo(0);
         assertThat(result.totalPages()).isEqualTo(0);
-
         verify(customerRepository).findAll(pageable);
         verify(customerMapper, never()).toResponse(any(Customer.class));
     }
